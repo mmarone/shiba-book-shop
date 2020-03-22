@@ -1,5 +1,10 @@
 # pos
 
+## Create .env.local file for set enviroment variable
+```
+VUE_APP_API_URL=YOUR_API_URL
+```
+
 ## Project setup
 ```
 npm install
