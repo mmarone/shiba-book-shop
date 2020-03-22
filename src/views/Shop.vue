@@ -326,36 +326,47 @@ export default {
       }
       this.manageUniqueBook(book);
     },
-    manageUniqueBook(book) {
-      if (this.uniqueBook.length > 0) {
-        this.uniqueBook.every((element, index) => {
-          let found = element.find(objBook => {
-            return objBook == book;
-          });
-          if (!found) {
-            this.uniqueBook[index].push(book);
-            return false;
-          } else {
-            if (!this.uniqueBook[index + 1]) {
-              this.uniqueBook.push([book]);
+    manageUniqueBook(book, action = "add") {
+      if (action == "add") {
+        if (this.uniqueBook.length > 0) {
+          this.uniqueBook.every((element, index) => {
+            let found = element.find(objBook => {
+              return objBook == book;
+            });
+            if (!found) {
+              this.uniqueBook[index].push(book);
               return false;
             } else {
-              return true;
+              if (!this.uniqueBook[index + 1]) {
+                this.uniqueBook.push([book]);
+                return false;
+              } else {
+                return true;
+              }
             }
-          }
-        });
+          });
+        } else {
+          this.uniqueBook.push([book]);
+        }
       } else {
-        this.uniqueBook.push([book]);
+        this.uniqueBook.every((element, index) => {
+          element.forEach((objBook, objBookIndex) => {
+            if (objBook == book) {
+              this.uniqueBook[index].splice(objBookIndex, 1);
+            }
+          });
+        });
       }
     },
     editItem(index, book, action) {
       if (action === "add") {
         this.cartList[index].total++;
+        this.manageUniqueBook(book);
       } else if (action === "delete") {
         this.cartList[index].total--;
+        this.manageUniqueBook(book, action);
         if (this.cartList[index].total <= 0) this.cartList.splice(index, 1);
       }
-      this.manageUniqueBook(book);
     },
     reset() {
       this.cartList = [];
