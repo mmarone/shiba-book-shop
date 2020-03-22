@@ -101,7 +101,7 @@
           </v-col>
           <v-col class="item-panel" cols="12" lg="9">
             <v-card class="pa-2 v-card-main" :elevation="6">
-              <v-row class="overflow-auto" no-gutters>
+              <v-row v-if="success" class="overflow-auto" no-gutters>
                 <v-col
                   v-for="book in bookLists"
                   :key="book.id"
@@ -132,6 +132,14 @@
                   </v-card>
                 </v-col>
               </v-row>
+              <v-container v-else fill-height fluid>
+                <v-row align="center" justify="center">
+                  <v-col class="d-flex flex-column align-center">
+                    <v-img src="@/assets/image/shiba-error.png"> </v-img>
+                    <h1>Connection error. Please try again...</h1>
+                  </v-col>
+                </v-row>
+              </v-container>
             </v-card>
           </v-col>
         </v-row>
@@ -242,6 +250,7 @@ export default {
   data() {
     return {
       url: process.env.VUE_APP_API_URL,
+      success: true,
       bookLists: [],
       cartList: [],
       dialog: false,
@@ -269,9 +278,7 @@ export default {
     };
   },
   mounted() {
-    axios.get(this.url).then(res => {
-      this.bookLists = [...res.data.books];
-    });
+    this.initData();
   },
   computed: {
     total() {
@@ -305,6 +312,18 @@ export default {
     }
   },
   methods: {
+    initData() {
+      axios
+        .get(this.url)
+        .then(res => {
+          this.success = true;
+          this.bookLists = [...res.data.books];
+        })
+        .catch(err => {
+          console.log(err);
+          this.success = false;
+        });
+    },
     addToCart(book) {
       if (this.cartList.length > 0) {
         let found = this.cartList.find(element => {
