@@ -368,12 +368,23 @@ export default {
           this.uniqueBook.push([book]);
         }
       } else {
+        console.log(this.uniqueBook);
         this.uniqueBook.every((element, index) => {
-          element.forEach((objBook, objBookIndex) => {
-            if (objBook == book) {
-              this.uniqueBook[index].splice(objBookIndex, 1);
-            }
+          let found = element.find(objBook => {
+            return objBook == book;
           });
+          if (found) {
+            element.forEach((objBook, objBookIndex) => {
+              if (objBook == found) {
+                this.uniqueBook[index].splice(objBookIndex, 1);
+                return false;
+              }
+            });
+            if (element.length == 0) {
+              this.uniqueBook.splice(index, 1);
+            }
+            return false;
+          }
         });
       }
     },
@@ -383,12 +394,15 @@ export default {
         this.manageUniqueBook(book);
       } else if (action === "delete") {
         this.cartList[index].total--;
+        if (this.cartList[index].total <= 0) {
+          this.cartList.splice(index, 1);
+        }
         this.manageUniqueBook(book, action);
-        if (this.cartList[index].total <= 0) this.cartList.splice(index, 1);
       }
     },
     reset() {
       this.cartList = [];
+      this.uniqueBook = [];
     },
     onPayment() {
       if (this.$refs.form.validate()) {
